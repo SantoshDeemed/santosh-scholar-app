@@ -1,5 +1,5 @@
 """Santosh Deemed to be University - PhD/JRF Scholar App (FastAPI + SQLite)."""
-import os, io, csv, math, secrets, hashlib, sqlite3, datetime as dt
+import os, io, re, csv, math, secrets, hashlib, sqlite3, datetime as dt
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Header
 from fastapi.responses import Response
@@ -7,32 +7,62 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 DB = os.getenv("DB_PATH", "data/app.db")
-UP = os.getenv("UPLOAD_DIR", "data/uploads")
-os.makedirs(os.path.dirname(DB) or ".", exist_ok=True); os.makedirs(UP, exist_ok=True)
+DBURL = os.getenv("DATABASE_URL", "")
+PG = DBURL.startswith("postgres")   # DATABASE_URL set -> Postgres (data safe). Not set -> local SQLite file.
+if PG:
+    import psycopg2, psycopg2.extras
+    DBERR = (sqlite3.IntegrityError, psycopg2.IntegrityError)
+    BIN = psycopg2.Binary
+else:
+    DBERR = (sqlite3.IntegrityError,)
+    BIN = lambda b: b
+    os.makedirs(os.path.dirname(DB) or ".", exist_ok=True)
 app = FastAPI(title="Santosh Scholar App")
 
 SCHEMA = """
-CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, uid TEXT UNIQUE, phone TEXT UNIQUE, name TEXT,
+CREATE TABLE IF NOT EXISTS users(id {ID}, uid TEXT UNIQUE, phone TEXT UNIQUE, name TEXT,
  role TEXT DEFAULT 'student', dept TEXT, category TEXT, supervisor TEXT, salt TEXT, pw TEXT, created TEXT);
 CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY, user_id INTEGER);
 CREATE TABLE IF NOT EXISTS settings(k TEXT PRIMARY KEY, v TEXT);
-CREATE TABLE IF NOT EXISTS attendance(id INTEGER PRIMARY KEY, user_id INTEGER, day TEXT, ts TEXT, kind TEXT,
- lat REAL, lng REAL, accuracy REAL, dist REAL, status TEXT, photo TEXT);
-CREATE TABLE IF NOT EXISTS meetings(id INTEGER PRIMARY KEY, kind TEXT, user_id INTEGER, title TEXT, date TEXT,
+CREATE TABLE IF NOT EXISTS attendance(id {ID}, user_id INTEGER, day TEXT, ts TEXT, kind TEXT,
+ lat {REAL}, lng {REAL}, accuracy {REAL}, dist {REAL}, status TEXT, photo TEXT);
+CREATE TABLE IF NOT EXISTS photos(name TEXT PRIMARY KEY, data {BLOB});
+CREATE TABLE IF NOT EXISTS meetings(id {ID}, kind TEXT, user_id INTEGER, title TEXT, date TEXT,
  members TEXT, status TEXT DEFAULT 'scheduled', minutes TEXT DEFAULT '');
-CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, milestone TEXT, status TEXT,
+CREATE TABLE IF NOT EXISTS reports(id {ID}, user_id INTEGER, title TEXT, milestone TEXT, status TEXT,
  publications TEXT, notes TEXT, created TEXT, feedback TEXT DEFAULT '');
-CREATE TABLE IF NOT EXISTS updates(id INTEGER PRIMARY KEY, title TEXT, body TEXT, user_id INTEGER, created TEXT);
+CREATE TABLE IF NOT EXISTS updates(id {ID}, title TEXT, body TEXT, user_id INTEGER, created TEXT)
 """
 
+def conn():
+    if PG: return psycopg2.connect(DBURL, cursor_factory=psycopg2.extras.RealDictCursor)
+    c = sqlite3.connect(DB); c.row_factory = sqlite3.Row; return c
+
+def fix(sql):
+    if not PG: return sql
+    if sql.startswith("INSERT OR IGNORE INTO"): sql = sql.replace("INSERT OR IGNORE INTO", "INSERT INTO") + " ON CONFLICT DO NOTHING"
+    elif sql.startswith("REPLACE INTO"): sql = sql.replace("REPLACE INTO", "INSERT INTO") + " ON CONFLICT (k) DO UPDATE SET v=EXCLUDED.v"
+    sql = sql.replace("?", "%s")
+    if re.match(r"INSERT INTO (users|attendance|meetings|reports|updates)\b", sql): sql += " RETURNING id"
+    return sql
+
 def q(sql, a=(), one=False, write=False):
-    c = sqlite3.connect(DB); c.row_factory = sqlite3.Row
+    c = conn(); sql = fix(sql)
     try:
-        cur = c.execute(sql, a)
-        if write: c.commit(); return cur.lastrowid
+        cur = c.cursor(); cur.execute(sql, a)
+        if write:
+            rid = cur.fetchone()["id"] if PG and sql.endswith("RETURNING id") else (None if PG else cur.lastrowid)
+            c.commit(); return rid
         r = [dict(x) for x in cur.fetchall()]
         return (r[0] if r else None) if one else r
     finally: c.close()
+
+def setup():
+    sc = SCHEMA.replace("{ID}", "SERIAL PRIMARY KEY" if PG else "INTEGER PRIMARY KEY").replace("{REAL}", "DOUBLE PRECISION" if PG else "REAL").replace("{BLOB}", "BYTEA" if PG else "BLOB")
+    c = conn(); cur = c.cursor()
+    for st in sc.split(";"):
+        if st.strip(): cur.execute(st)
+    c.commit(); c.close()
 
 def hp(pw, salt): return hashlib.pbkdf2_hmac("sha256", pw.encode(), salt.encode(), 120_000).hex()
 def now(): return dt.datetime.now().isoformat(timespec="seconds")
@@ -42,7 +72,7 @@ def make_user(name, phone, role="student", dept="", category="", supervisor="", 
     try:
         i = q("INSERT INTO users(uid,phone,name,role,dept,category,supervisor,salt,pw,created) VALUES(?,?,?,?,?,?,?,?,?,?)",
               (secrets.token_hex(6), phone, name, role, dept, category, supervisor, salt, hp(pw, salt), now()), write=True)
-    except sqlite3.IntegrityError: raise HTTPException(400, "This phone number is already registered")
+    except DBERR: raise HTTPException(400, "This phone number is already registered")
     uid = "ADMIN" if role == "admin" else f"SDU{dt.date.today().year}{i:04d}"
     q("UPDATE users SET uid=? WHERE id=?", (uid, i), write=True)
     return {"id": i, "uid": uid, "password": pw}
@@ -53,7 +83,7 @@ def send_sms(phone, text):
 
 @app.on_event("startup")
 def init():
-    c = sqlite3.connect(DB); c.executescript(SCHEMA); c.close()
+    setup()
     for k, v in {"lat": "0", "lng": "0", "radius": "200"}.items():
         q("INSERT OR IGNORE INTO settings VALUES(?,?)", (k, v), write=True)
     if not q("SELECT 1 FROM users WHERE role='admin'", one=True):
@@ -73,7 +103,7 @@ def admin(u=Depends(user)):
     if u["role"] != "admin": raise HTTPException(403, "Admin only")
     return u
 
-def pub(u): return {k: u[k] for k in ("id", "uid", "phone", "name", "role", "dept", "category", "supervisor")}
+def pub(u): return {k: u[k] for k in ("id", "uid", "phone", "name", "role", "dept", "category", "supervisor", "created")}
 
 class LoginIn(BaseModel): uid: str; password: str
 class PwIn(BaseModel): old: str; new: str
@@ -148,7 +178,7 @@ async def mark(kind: str = Form(...), lat: float = Form(...), lng: float = Form(
         raise HTTPException(400, f"You already marked {kind.upper()} today")
     d = dist_m(lat, lng, s["lat"], s["lng"]); ok = d <= s["radius"]
     fn = secrets.token_hex(16) + ".jpg"
-    open(os.path.join(UP, fn), "wb").write(data)
+    q("INSERT INTO photos(name,data) VALUES(?,?)", (fn, BIN(data)), write=True)
     q("INSERT INTO attendance(user_id,day,ts,kind,lat,lng,accuracy,dist,status,photo) VALUES(?,?,?,?,?,?,?,?,?,?)",
       (u["id"], day, now(), kind, lat, lng, accuracy, d, "present" if ok else "rejected", fn), write=True)
     if not ok: raise HTTPException(403, f"You are {int(d)} m from campus (limit {int(s['radius'])} m). Attendance not marked.")
@@ -219,5 +249,10 @@ def dash(_=Depends(staff)):
             "pending": n("SELECT COUNT(*) n FROM meetings WHERE status='scheduled'"),
             "reports": n("SELECT COUNT(*) n FROM reports WHERE feedback=''")}
 
-app.mount("/uploads", StaticFiles(directory=UP), name="uploads")
+@app.get("/uploads/{name}")
+def photo(name: str):
+    r = q("SELECT data FROM photos WHERE name=?", (name,), one=True)
+    if not r: raise HTTPException(404, "No photo")
+    return Response(bytes(r["data"]), media_type="image/jpeg", headers={"Cache-Control": "private, max-age=86400"})
+
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

@@ -195,8 +195,8 @@ async function attInit(){const b=$('#go');if(!b)return;
  try{cam=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});$('#vid').srcObject=cam;msg('#am','Face the camera, then tap the red button.',true)}catch{msg('#am','Camera is blocked. Allow camera access. Site needs HTTPS.');b.disabled=true;return}
  b.onclick=async()=>{b.disabled=true;msg('#am','Checking your location...',true);
   try{const p=await new Promise((ok,no)=>navigator.geolocation.getCurrentPosition(ok,no,{enableHighAccuracy:true,timeout:15000}));
-   const v=$('#vid'),c=$('#cv');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
-   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.8)),f=new FormData();f.append('kind',ATT);f.append('lat',p.coords.latitude);f.append('lng',p.coords.longitude);f.append('accuracy',p.coords.accuracy||0);f.append('photo',blob,'s.jpg');
+   const v=$('#vid'),c=$('#cv');const sc=Math.min(1,480/v.videoWidth);c.width=v.videoWidth*sc;c.height=v.videoHeight*sc;c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.72)),f=new FormData();f.append('kind',ATT);f.append('lat',p.coords.latitude);f.append('lng',p.coords.longitude);f.append('accuracy',p.coords.accuracy||0);f.append('photo',blob,'s.jpg');
    const r=await fetch('/api/attendance',{method:'POST',headers:{Authorization:'Bearer '+T},body:f}),d=await r.json();if(!r.ok)throw Error(d.detail);
    msg('#am','Attendance marked. You are inside campus.',true);setTimeout(()=>go('home'),1500)}catch(x){msg('#am',x.code?'Location is blocked. Allow location access.':x.message);b.disabled=false}}}
 show();
