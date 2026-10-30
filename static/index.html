@@ -49,6 +49,47 @@ body.admin .card form .row{flex-wrap:nowrap}}
 #login .info{display:flex;gap:12px;align-items:center;background:#e4eaff;color:#1e3a8a;border-radius:14px;padding:14px;margin-top:22px;font-size:.9rem}
 #login .signin{margin-top:auto;position:sticky;bottom:16px;width:100%;background:#c8102e;border-radius:18px;padding:18px;font-size:1.05rem;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px rgba(200,16,46,.3)}
 #login form>.info{margin-bottom:26px}
+
+/* ===== student app ===== */
+body.stu header{display:none}body.stu main{padding:0}
+body.stu nav{overflow:visible;border-top:0;border-radius:24px 24px 0 0;box-shadow:0 -8px 28px rgba(18,53,91,.14);height:68px;align-items:center}
+body.stu nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.72rem;background:none;color:#8a96a8;min-width:0}
+body.stu nav button.on{color:var(--red);box-shadow:none}
+body.stu nav button.fab{flex:none;width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#e11d3a,#a30f26);color:#fff;margin-top:-38px;padding:0;justify-content:center;box-shadow:0 10px 20px rgba(200,16,46,.4),0 0 0 6px #fff}
+.hero{background:linear-gradient(165deg,#0b2a55 0%,#164a8f 60%,#1f6fd1 100%);color:#fff;padding:calc(18px + env(safe-area-inset-top,0px)) 20px 62px;border-radius:0 0 34px 34px;border-bottom:4px solid var(--gold)}
+.hero .top{display:flex;align-items:center;gap:12px}.hero .top img{height:46px;background:#fff;border-radius:10px;padding:3px}
+.hero .top div{flex:1;line-height:1.2}.hero small{opacity:.8;font-size:.8rem}.hero b{font-size:1.15rem;display:block}
+.bellb{background:rgba(255,255,255,.14);width:44px;height:44px;border-radius:50%;padding:0;display:grid;place-items:center;position:relative;color:#fff}
+.bellb i{position:absolute;top:8px;right:9px;width:10px;height:10px;border-radius:50%;background:#ff4d5e;border:2px solid #164a8f}
+.sum{display:flex;align-items:center;gap:18px;margin:22px 0 16px}
+.ringp{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(#4ade80 calc(var(--p)*1%),rgba(255,255,255,.2) 0);display:grid;place-items:center;position:relative;flex:none}
+.ringp:before{content:"";position:absolute;inset:9px;border-radius:50%;background:#12417f}.ringp b{position:relative;font-size:1.45rem}
+.sum span{display:block;opacity:.85}.sum strong{font-size:1.1rem}
+.sum .pa{display:flex;gap:8px;margin-top:8px}.pa em{font-style:normal;padding:4px 10px;border-radius:99px;font-size:.8rem;font-weight:700}
+.pa .g{background:#16a34a}.pa .r{background:#dc2626}
+.outl{width:100%;background:transparent;border:1.5px solid rgba(255,255,255,.85);border-radius:12px;display:flex;gap:8px;align-items:center;justify-content:center}
+.sbody{padding:14px}.sbody>h2{display:none}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 4px;margin:-38px 14px 14px;padding:18px 8px;border-radius:22px;box-shadow:0 10px 30px rgba(18,53,91,.12)}
+.grid button{background:none;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:7px;font-size:.74rem;font-weight:500;padding:0;min-height:0}
+.grid i{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,#fff),0 4px 10px color-mix(in srgb,var(--c) 18%,transparent)}
+.sec{margin:18px 16px 8px;color:var(--navy);font-size:1.05rem}.hm{padding:0 14px}
+.tt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chip{background:#f1f4f9;border-radius:14px;padding:12px 14px}.chip small{color:var(--mute);display:block}.chip b{font-size:1.5rem;color:#9aa6b8}.chip.ok{background:#e3f6ea}.chip.ok b{color:#14692c}
+.bar{display:flex;align-items:center;gap:10px;background:linear-gradient(165deg,#0b2a55,#1b5aa8);color:#fff;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 22px;border-radius:0 0 26px 26px;border-bottom:3px solid var(--gold)}
+.bar button{background:rgba(255,255,255,.15);width:40px;height:40px;padding:0;border-radius:50%;font-size:1.4rem;line-height:1}.bar b{font-size:1.1rem}
+.sbody{margin-top:-12px}
+.vw{position:relative;border-radius:22px;overflow:hidden;background:#0b1b33;aspect-ratio:3/4}.vw video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);max-height:none;border-radius:0}
+.vw .fr{position:absolute;inset:14% 16%;border:3px solid rgba(255,255,255,.85);border-radius:50%;box-shadow:0 0 0 999px rgba(11,27,51,.35)}
+.big{width:100%;margin-top:12px;background:linear-gradient(145deg,#e11d3a,#a30f26);border-radius:16px;padding:17px;font-size:1.1rem;display:flex;gap:10px;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(200,16,46,.3)}
+.done{text-align:center;color:#14692c}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.mh button{background:#eef2f8;color:var(--navy);width:40px;height:40px;padding:0;font-size:1.3rem}
+.wk,.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}.wk span{font-size:.75rem;color:var(--mute);font-weight:700;padding-bottom:4px}
+.dc{aspect-ratio:1;padding:0;min-height:0;border-radius:12px;font-weight:700;font-size:.9rem;background:#eef2f8;color:#7a8799}
+.dc.p{background:#16a34a;color:#fff}.dc.a{background:#dc2626;color:#fff}.dc.s{background:#f6f7fa;color:#c3cad6}
+.dc.td{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--navy)}
+.lg{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:.8rem;color:var(--mute)}.lg i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+.lg .p{background:#16a34a}.lg .a{background:#dc2626}.lg .f{background:#cfd7e4}
+.s3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.s3 .card{margin:0;text-align:center;padding:12px 6px}.s3 b{display:block;font:800 1.6rem Georgia,serif}
 </style></head><body>
 <div id="login" class="hide"><img src="/logo.png" alt="Santosh logo">
 <div class="eyebrow">Santosh Deemed to be University</div><h1>PhD &amp; JRF<br>Scholar Portal</h1>
@@ -69,30 +110,29 @@ async function api(p,o={}){const h={};if(T)h.Authorization='Bearer '+T;if(o.json
  if(r.status===401&&p!=='/login'){logout();throw Error('Session ended')}if(!r.ok)throw Error(d.detail||'Something went wrong');return d}
 const msg=(id,t,ok)=>{$(id).innerHTML=t?`<div class="msg ${ok?'g':'e'}">${e(t)}</div>`:''};
 const fd=t=>t?new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'';
-function logout(){document.body.classList.remove('admin');localStorage.removeItem('t');T=null;ME=null;stopCam();show()}
+function logout(){document.body.classList.remove('admin','stu');localStorage.removeItem('t');T=null;ME=null;stopCam();show()}
 $('#eye').onclick=()=>{const i=$('#p');i.type=i.type==='password'?'text':'password'};
 $('#lf').onsubmit=async ev=>{ev.preventDefault();try{const d=await api('/login',{method:'POST',json:{uid:$('#u').value,password:$('#p').value}});T=d.token;localStorage.t=T;ME=d.user;show()}catch(x){msg('#le',x.message)}};
 const ADMIN=[['dash','Home'],['stu','Students'],['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['set','Campus']];
-const STUDENT=[['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['me','Profile']];
+const STUDENT=[['home','Home']];
 async function show(){
  if(!T){$('#login').classList.remove('hide');$('#app').classList.add('hide');return}
  try{ME=await api('/me')}catch{return}
- document.body.classList.toggle('admin',ME.role!=='student');$('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=`${ME.name} (${ME.uid})`;
- const items=ME.role==='student'?STUDENT:ADMIN;$('#nav').innerHTML=items.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('');
+ document.body.classList.toggle('admin',ME.role!=='student');document.body.classList.toggle('stu',ME.role==='student');$('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=`${ME.name} (${ME.uid})`;
+ const items=ME.role==='student'?STUDENT:ADMIN;$('#nav').innerHTML=ME.role==='student'?SNAV:items.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('');
  if(ME.role!=='student')STU=await api('/students');go(items[0][0]);bellCheck()}
 async function bellCheck(){const u=await api('/updates');const seen=+localStorage.seen||0;const n=u.filter(x=>x.id>seen).length;const b=$('#bell');
  b.style.display=n?'':'none';b.textContent=`${n} new`;b.onclick=()=>go('upd')}
 let cam=null;function stopCam(){cam&&cam.getTracks().forEach(t=>t.stop());cam=null}
 async function go(k){stopCam();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
- try{$('#v').innerHTML=await V[k]()}catch(x){$('#v').innerHTML=`<div class="msg e">${e(x.message)}</div>`}if(B[k])B[k]()}
+ try{$('#v').innerHTML=wrap(k,await V[k]())}catch(x){$('#v').innerHTML=`<div class="msg e">${e(x.message)}</div>`}if(B[k])B[k]()}
 const opts=()=>STU.filter(s=>s.role==='student').map(s=>`<option value="${s.id}">${e(s.name)} (${e(s.uid)})</option>`).join('');
 const attTable=(r,adm)=>`<div class="scroll"><table><tr><th>Photo</th>${adm?'<th>Student</th>':''}<th>Time</th><th>Type</th><th>Status</th><th>Dist</th></tr>${r.map(a=>`<tr><td><a href="/uploads/${a.photo}" target="_blank"><img class="thumb" src="/uploads/${a.photo}" alt="selfie"></a></td>${adm?`<td>${e(a.name)}<br><span class="mute">${e(a.uid)}</span></td>`:''}<td>${fd(a.ts)}</td><td>${a.kind.toUpperCase()}</td><td><span class="pill ${a.status==='present'?'ok':'bad'}">${a.status}</span></td><td>${Math.round(a.dist)} m<br><a href="https://maps.google.com/?q=${a.lat},${a.lng}" target="_blank">map</a></td></tr>`).join('')||'<tr><td colspan=6 class="mute">No records yet.</td></tr>'}</table></div>`;
 const V={
 async dash(){const d=await api('/dashboard');return `<h2>Dashboard</h2><div class="stats"><div class="card"><b>${d.students}</b>Scholars</div><div class="card"><b>${d.present}</b>Present today</div><div class="card"><b>${d.pending}</b>Pending DRC/RAC</div><div class="card"><b>${d.reports}</b>Reports awaiting feedback</div></div>`},
 async att(){const adm=ME.role!=='student';const r=await api('/attendance'+(adm?'?day='+(window.D||''):''));
  if(adm)return `<h2>Attendance</h2><div class="card row"><div><label>Date</label><input type="date" id="ad" value="${window.D||''}"></div><button class="alt" onclick="D=$('#ad').value;go('att')">Filter</button><button class="ghost" onclick="csv()">Export CSV</button></div><div class="card">${attTable(r,true)}</div>`;
- return `<h2>Mark attendance</h2><div class="card"><p class="mute">Open the camera, then tap IN or OUT. Your selfie and GPS location are checked against the campus.</p><video id="vid" autoplay playsinline muted class="hide"></video><canvas id="cv" class="hide"></canvas><div id="am"></div>
- <div class="row"><button class="alt" id="oc">Open camera</button></div><div class="row" style="margin-top:8px"><button id="bi" disabled>Mark IN</button><button id="bo" class="alt" disabled>Mark OUT</button></div></div><h3>My history</h3><div class="card">${attTable(r,false)}</div>`},
+ return attStu(r)},
 async stu(){return `<h2>Scholars</h2><div class="card"><form id="sf"><div class="row"><div><label>Full name</label><input name="name" required></div><div><label>Phone number</label><input name="phone" required pattern="[0-9+ ]{10,15}"></div></div>
  <div class="row"><div><label>Department</label><input name="dept"></div><div><label>Category</label><select name="category"><option>PhD</option><option>JRF</option></select></div><div><label>Supervisor</label><input name="supervisor"></div></div><div id="sm"></div><button style="margin-top:10px">Register and send ID + password</button></form></div>
  <div class="card scroll"><table><tr><th>Name</th><th>ID</th><th>Phone</th><th>Cat.</th><th></th></tr>${STU.map(s=>`<tr><td>${e(s.name)}<br><span class="mute">${e(s.dept)} ${e(s.supervisor)}</span></td><td>${e(s.uid)}</td><td>${e(s.phone)}</td><td>${e(s.category)}</td><td><button class="sm ghost" onclick="rs(${s.id})">Reset</button> <button class="sm" onclick="dl(${s.id})">Delete</button></td></tr>`).join('')}</table></div>`},
@@ -108,15 +148,7 @@ async set(){const s=await api('/settings');return `<h2>Campus location</h2><div 
 async me(){return `<h2>${e(ME.name)}</h2><div class="card">ID: <b>${e(ME.uid)}</b><br>Phone: ${e(ME.phone)}<br>${e(ME.category)} - ${e(ME.dept)}<br>Supervisor: ${e(ME.supervisor)||'-'}</div><div class="card"><h3>Change password</h3><form id="pf"><label>Current password</label><input type="password" name="old" required><label>New password</label><input type="password" name="new" minlength="6" required><div id="pm"></div><button style="margin-top:10px">Change password</button></form></div>`}};
 const form=(id,fn)=>{const f=$(id);if(f)f.onsubmit=async ev=>{ev.preventDefault();try{await fn(Object.fromEntries(new FormData(f)))}catch(x){alert(x.message)}}};
 const B={
-att(){if(ME.role!=='student')return;const oc=$('#oc');
- oc.onclick=async()=>{try{cam=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});$('#vid').srcObject=cam;$('#vid').classList.remove('hide');$('#bi').disabled=$('#bo').disabled=false;oc.disabled=true}catch(x){msg('#am','Camera blocked. Allow camera access and use HTTPS.')}};
- const send=kind=>async()=>{msg('#am','Getting your location...',true);
-  try{const p=await new Promise((ok,no)=>navigator.geolocation.getCurrentPosition(ok,no,{enableHighAccuracy:true,timeout:15000}));
-   const v=$('#vid'),c=$('#cv');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
-   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.8));const f=new FormData();f.append('kind',kind);f.append('lat',p.coords.latitude);f.append('lng',p.coords.longitude);f.append('accuracy',p.coords.accuracy||0);f.append('photo',blob,'s.jpg');
-   const r=await fetch('/api/attendance',{method:'POST',headers:{Authorization:'Bearer '+T},body:f});const d=await r.json();if(!r.ok)throw Error(d.detail);
-   msg('#am',`${kind.toUpperCase()} marked. You are ${d.distance} m from the campus centre.`,true);setTimeout(()=>go('att'),1800)}catch(x){msg('#am',x.code?'Location blocked. Allow location access.':x.message)}};
- $('#bi').onclick=send('in');$('#bo').onclick=send('out')},
+att(){if(ME.role==='student')attInit()},cal(){},home(){},
 stu(){form('#sf',async d=>{const r=await api('/students',{method:'POST',json:d});STU=await api('/students');alert(`Registered.\nID: ${r.uid}\nPassword: ${r.password}\n(also sent by SMS)`);go('stu')})},
 mtg(){form('#mf',async d=>{d.user_id=+d.user_id;await api('/meetings',{method:'POST',json:d});go('mtg')})},
 res(){form('#rf',async d=>{await api('/reports',{method:'POST',json:d});go('res')})},
@@ -129,5 +161,43 @@ async function dl(i){if(!confirm('Delete this scholar?'))return;await api('/stud
 async function mu(i,s){await api('/meetings/'+i,{method:'PUT',json:{status:s,minutes:$('#mi'+i).value}});go('mtg')}
 async function sf(i){await api(`/reports/${i}/feedback`,{method:'PUT',json:{feedback:$('#fb'+i).value}});go('res')}
 async function csv(){const r=await fetch('/api/attendance.csv?day='+(window.D||''),{headers:{Authorization:'Bearer '+T}});const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download='attendance.csv';a.click()}
+const IC={home:'<path d="M3 11l9-8 9 8v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',cam:'<path d="M3 8a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><circle cx="12" cy="13" r="4"/>',bell:'<path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 004 0"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',book:'<path d="M4 19V5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19a2 2 0 002 2h13"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0114 0M17 4a3.5 3.5 0 010 7M22 21a6 6 0 00-4-5.6"/>',flask:'<path d="M9 3h6M10 3v6L4 19a2 2 0 002 3h12a2 2 0 002-3l-6-10V3"/>',out:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',ok:'<path d="M5 13l4 4L19 7"/>'};
+const ic=(n,z=24)=>`<svg width="${z}" height="${z}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</svg>`;
+const SNAV=`<button data-k="home" onclick="go('home')">${ic('home')}Home</button><button data-k="cal" onclick="go('cal')">${ic('cal')}Calendar</button><button class="fab" data-k="att" onclick="go('att')" aria-label="Mark attendance">${ic('cam',28)}</button><button data-k="upd" onclick="go('upd')">${ic('bell')}Updates</button><button data-k="me" onclick="go('me')">${ic('user')}Account</button>`;
+const TT={att:'Mark attendance',cal:'My attendance',mtg:'DRC and RAC',res:'Research work',upd:'Class updates',me:'My account'};
+const wrap=(k,h)=>ME.role!=='student'||k==='home'?h:`<div class="bar"><button onclick="go('home')" aria-label="Back">&lsaquo;</button><b>${TT[k]}</b></div><div class="sbody">${h}</div>`;
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const tm=x=>x?new Date(x.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'--:--';
+function amap(r){const m={};r.filter(x=>x.status==='present').forEach(x=>{(m[x.day]=m[x.day]||{})[x.kind]=x});return m}
+function dstat(m,k,d){const td=ymd(new Date()),cr=(ME.created||'').slice(0,10);if(m[k])return'p';if(k>=td||k<cr||d.getDay()===0)return d.getDay()===0?'s':'f';return'a'}
+function mstats(m,y,mo){let p=0,a=0;const n=new Date(y,mo+1,0).getDate();for(let i=1;i<=n;i++){const d=new Date(y,mo,i),t=dstat(m,ymd(d),d);if(t==='p')p++;if(t==='a')a++}return{p,a,pct:p+a?Math.round(p*100/(p+a)):0}}
+V.home=async()=>{const r=await api('/attendance'),u=await api('/updates'),m=amap(r),n=new Date(),s=mstats(m,n.getFullYear(),n.getMonth()),t=m[ymd(n)]||{},nw=u.filter(x=>x.id>(+localStorage.seen||0)).length;
+ const G=[['cam','Attendance','att','#c8102e'],['cal','Calendar','cal','#1b5aa8'],['book','DRC','mtg','#7c3aed'],['users','RAC','mtg','#0e9f6e'],['flask','Research','res','#d97706'],['bell','Updates','upd','#0891b2'],['user','Account','me','#475569'],['out','Log out','logout','#64748b']];
+ return `<section class="hero"><div class="top"><img src="/logo.png" alt=""><div><small>Welcome back</small><b>${e(ME.name)}</b></div><button class="bellb" onclick="go('upd')" aria-label="Updates">${ic('bell')}${nw?'<i></i>':''}</button></div>
+ <div class="sum"><div class="ringp" style="--p:${s.pct}"><b>${s.pct}%</b></div><div><span>This month</span><strong>${e(ME.category)} scholar</strong><div class="pa"><em class="g">${s.p} present</em><em class="r">${s.a} absent</em></div></div></div>
+ <button class="outl" onclick="go('att')">${ic('cam',20)} Mark attendance</button></section>
+ <div class="grid card">${G.map(g=>`<button onclick="${g[2]==='logout'?'logout()':`go('${g[2]}')`}"><i style="--c:${g[3]}">${ic(g[0])}</i>${g[1]}</button>`).join('')}</div>
+ <h3 class="sec">Today</h3><div class="hm"><div class="card tt"><div class="chip ${t.in?'ok':''}"><small>Check in</small><b>${tm(t.in)}</b></div><div class="chip ${t.out?'ok':''}"><small>Check out</small><b>${tm(t.out)}</b></div></div></div>
+ <h3 class="sec">Latest update</h3><div class="hm">${u[0]?`<div class="card"><b>${e(u[0].title)}</b><p style="margin:.3em 0">${e(u[0].body)}</p><span class="mute">${fd(u[0].created)}</span></div>`:'<div class="card mute">No updates yet.</div>'}</div>`};
+let CM=new Date();CM.setDate(1);let AM={};
+V.cal=async()=>{AM=amap(await api('/attendance'));const y=CM.getFullYear(),mo=CM.getMonth(),s=mstats(AM,y,mo),f=new Date(y,mo,1).getDay(),n=new Date(y,mo+1,0).getDate();let c='<i></i>'.repeat(f);
+ for(let i=1;i<=n;i++){const d=new Date(y,mo,i),k=ymd(d);c+=`<button class="dc ${dstat(AM,k,d)}${k===ymd(new Date())?' td':''}" onclick="dayInfo('${k}')">${i}</button>`}
+ return `<div class="s3"><div class="card"><b style="color:#16a34a">${s.p}</b>Present</div><div class="card"><b style="color:#dc2626">${s.a}</b>Absent</div><div class="card"><b style="color:#1b5aa8">${s.pct}%</b>Attendance</div></div>
+ <div class="card"><div class="mh"><button onclick="cm(-1)" aria-label="Previous month">&lsaquo;</button><b>${CM.toLocaleString('en',{month:'long',year:'numeric'})}</b><button onclick="cm(1)" aria-label="Next month">&rsaquo;</button></div><div class="wk">${[...'SMTWTFS'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cg">${c}</div>
+ <div class="lg"><span><i class="p"></i>Present</span><span><i class="a"></i>Absent</span><span><i class="f"></i>Pending or Sunday</span></div></div><div id="di" class="card mute">Tap a day to see check in and check out times.</div>`};
+function cm(d){CM.setMonth(CM.getMonth()+d);go('cal')}
+function dayInfo(k){const x=AM[k];$('#di').innerHTML=x?`<b>${k}</b><br>Check in: ${tm(x.in)}<br>Check out: ${tm(x.out)}`:`<b>${k}</b><br>No attendance marked.`}
+let ATT=null;
+function attStu(r){const t=amap(r)[ymd(new Date())]||{};ATT=t.in?(t.out?null:'out'):'in';
+ return `<div class="card tt"><div class="chip ${t.in?'ok':''}"><small>Check in</small><b>${tm(t.in)}</b></div><div class="chip ${t.out?'ok':''}"><small>Check out</small><b>${tm(t.out)}</b></div></div>`+
+ (ATT?`<div class="card"><div class="vw"><video id="vid" autoplay playsinline muted></video><canvas id="cv" class="hide"></canvas><span class="fr"></span></div><div id="am" style="text-align:center"></div><button class="big" id="go">${ic('cam')} Check ${ATT==='in'?'in':'out'} now</button></div>`:`<div class="card done">${ic('ok',40)}<h3>All done for today</h3><p class="mute">Check in and check out are both marked.</p></div>`)}
+async function attInit(){const b=$('#go');if(!b)return;
+ try{cam=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});$('#vid').srcObject=cam;msg('#am','Face the camera, then tap the red button.',true)}catch{msg('#am','Camera is blocked. Allow camera access. Site needs HTTPS.');b.disabled=true;return}
+ b.onclick=async()=>{b.disabled=true;msg('#am','Checking your location...',true);
+  try{const p=await new Promise((ok,no)=>navigator.geolocation.getCurrentPosition(ok,no,{enableHighAccuracy:true,timeout:15000}));
+   const v=$('#vid'),c=$('#cv');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
+   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.8)),f=new FormData();f.append('kind',ATT);f.append('lat',p.coords.latitude);f.append('lng',p.coords.longitude);f.append('accuracy',p.coords.accuracy||0);f.append('photo',blob,'s.jpg');
+   const r=await fetch('/api/attendance',{method:'POST',headers:{Authorization:'Bearer '+T},body:f}),d=await r.json();if(!r.ok)throw Error(d.detail);
+   msg('#am','Attendance marked. You are inside campus.',true);setTimeout(()=>go('home'),1500)}catch(x){msg('#am',x.code?'Location is blocked. Allow location access.':x.message);b.disabled=false}}}
 show();
 </script></body></html>
