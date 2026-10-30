@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12355B"><link rel="manifest" href="/manifest.json">
+<title>Santosh Deemed to be University - Scholar App</title>
+<style>
+:root{--red:#B3202A;--gold:#C9A227;--navy:#12355B;--bg:#F4F6FA;--card:#fff;--ink:#1b2432;--mute:#5d6b7e;--line:#dde3ec}
+*{box-sizing:border-box}html{background:#cfd8e6}body{margin:0 auto;max-width:430px;min-height:100vh;box-shadow:0 0 30px rgba(18,53,91,.25);background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:78px}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:.2em 0}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:4px solid var(--gold);position:sticky;top:0;z-index:5}
+header img{height:42px}header b{flex:1;font-family:Georgia,serif;font-size:1.05rem;line-height:1.1}header small{display:block;font:.72rem system-ui;opacity:.8}
+main{padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 12px}
+label{display:block;font-size:.85rem;color:var(--mute);margin:8px 0 3px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+button{background:var(--red);color:#fff;border:0;border-radius:8px;padding:12px 16px;font-weight:600;cursor:pointer;min-height:44px}
+button.alt{background:var(--navy)}button.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}button.sm{padding:6px 10px;min-height:0;font-size:.85rem}
+button:disabled{opacity:.5}:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:3px solid var(--gold);display:flex;overflow-x:auto;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{background:none;color:var(--mute);flex:1;min-width:76px;border-radius:0;font-size:.78rem;font-weight:600;padding:10px 6px}
+nav button.on{color:var(--red);box-shadow:inset 0 3px 0 var(--red)}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.78rem;font-weight:600;background:#e8eef7;color:var(--navy)}
+.ok{background:#dff3e4;color:#14692c}.bad{background:#fbe0e0;color:#a31212}
+.msg{padding:10px;border-radius:8px;margin:8px 0}.msg.e{background:#fbe0e0;color:#8f1010}.msg.g{background:#dff3e4;color:#14692c}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stats .card{margin:0}.stats b{font:700 2rem Georgia,serif;color:var(--red);display:block}
+table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}video,canvas{width:100%;border-radius:10px;background:#000;max-height:50vh}
+.thumb{width:44px;height:44px;object-fit:cover;border-radius:6px}.mute{color:var(--mute)}.hide{display:none}
+#login{max-width:380px;margin:8vh auto;text-align:center}#login img{width:150px}
+</style></head><body>
+<div id="login" class="hide card"><img src="/logo.png" alt="Santosh logo"><h2>Santosh Deemed to be University</h2>
+<p class="mute">PhD &amp; JRF Scholar Portal</p>
+<form id="lf" style="text-align:left"><label>User ID or phone number</label><input id="u" autocomplete="username" required>
+<label>Password</label><input id="p" type="password" autocomplete="current-password" required>
+<div id="le"></div><button style="width:100%;margin-top:10px">Log in</button></form>
+<p class="mute" style="font-size:.85rem">Your ID and password are sent to your phone when the university registers you.</p></div>
+<div id="app" class="hide"><header><img src="/logo.png" alt=""><b>Santosh Deemed to be University<small id="who"></small></b><button class="sm ghost" id="bell" style="display:none"></button><button class="sm ghost" onclick="logout()">Log out</button></header>
+<main id="v"></main><nav id="nav"></nav></div>
+<script>
+const $=s=>document.querySelector(s);let T=localStorage.t,ME=null,STU=[];
+const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(p,o={}){const h={};if(T)h.Authorization='Bearer '+T;if(o.json){h['Content-Type']='application/json';o.body=JSON.stringify(o.json)}
+ const r=await fetch('/api'+p,{method:o.method,body:o.body,headers:h});const d=await r.json().catch(()=>({}));
+ if(r.status===401&&p!=='/login'){logout();throw Error('Session ended')}if(!r.ok)throw Error(d.detail||'Something went wrong');return d}
+const msg=(id,t,ok)=>{$(id).innerHTML=t?`<div class="msg ${ok?'g':'e'}">${e(t)}</div>`:''};
+const fd=t=>t?new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'';
+function logout(){localStorage.removeItem('t');T=null;ME=null;stopCam();show()}
+$('#lf').onsubmit=async ev=>{ev.preventDefault();try{const d=await api('/login',{method:'POST',json:{uid:$('#u').value,password:$('#p').value}});T=d.token;localStorage.t=T;ME=d.user;show()}catch(x){msg('#le',x.message)}};
+const ADMIN=[['dash','Home'],['stu','Students'],['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['set','Campus']];
+const STUDENT=[['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['me','Profile']];
+async function show(){
+ if(!T){$('#login').classList.remove('hide');$('#app').classList.add('hide');return}
+ try{ME=await api('/me')}catch{return}
+ $('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=`${ME.name} (${ME.uid})`;
+ const items=ME.role==='student'?STUDENT:ADMIN;$('#nav').innerHTML=items.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('');
+ if(ME.role!=='student')STU=await api('/students');go(items[0][0]);bellCheck()}
+async function bellCheck(){const u=await api('/updates');const seen=+localStorage.seen||0;const n=u.filter(x=>x.id>seen).length;const b=$('#bell');
+ b.style.display=n?'':'none';b.textContent=`${n} new`;b.onclick=()=>go('upd')}
+let cam=null;function stopCam(){cam&&cam.getTracks().forEach(t=>t.stop());cam=null}
+async function go(k){stopCam();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+ try{$('#v').innerHTML=await V[k]()}catch(x){$('#v').innerHTML=`<div class="msg e">${e(x.message)}</div>`}if(B[k])B[k]()}
+const opts=()=>STU.filter(s=>s.role==='student').map(s=>`<option value="${s.id}">${e(s.name)} (${e(s.uid)})</option>`).join('');
+const attTable=(r,adm)=>`<div class="scroll"><table><tr><th>Photo</th>${adm?'<th>Student</th>':''}<th>Time</th><th>Type</th><th>Status</th><th>Dist</th></tr>${r.map(a=>`<tr><td><a href="/uploads/${a.photo}" target="_blank"><img class="thumb" src="/uploads/${a.photo}" alt="selfie"></a></td>${adm?`<td>${e(a.name)}<br><span class="mute">${e(a.uid)}</span></td>`:''}<td>${fd(a.ts)}</td><td>${a.kind.toUpperCase()}</td><td><span class="pill ${a.status==='present'?'ok':'bad'}">${a.status}</span></td><td>${Math.round(a.dist)} m<br><a href="https://maps.google.com/?q=${a.lat},${a.lng}" target="_blank">map</a></td></tr>`).join('')||'<tr><td colspan=6 class="mute">No records yet.</td></tr>'}</table></div>`;
+const V={
+async dash(){const d=await api('/dashboard');return `<h2>Dashboard</h2><div class="stats"><div class="card"><b>${d.students}</b>Scholars</div><div class="card"><b>${d.present}</b>Present today</div><div class="card"><b>${d.pending}</b>Pending DRC/RAC</div><div class="card"><b>${d.reports}</b>Reports awaiting feedback</div></div>`},
+async att(){const adm=ME.role!=='student';const r=await api('/attendance'+(adm?'?day='+(window.D||''):''));
+ if(adm)return `<h2>Attendance</h2><div class="card row"><div><label>Date</label><input type="date" id="ad" value="${window.D||''}"></div><button class="alt" onclick="D=$('#ad').value;go('att')">Filter</button><button class="ghost" onclick="csv()">Export CSV</button></div><div class="card">${attTable(r,true)}</div>`;
+ return `<h2>Mark attendance</h2><div class="card"><p class="mute">Open the camera, then tap IN or OUT. Your selfie and GPS location are checked against the campus.</p><video id="vid" autoplay playsinline muted class="hide"></video><canvas id="cv" class="hide"></canvas><div id="am"></div>
+ <div class="row"><button class="alt" id="oc">Open camera</button></div><div class="row" style="margin-top:8px"><button id="bi" disabled>Mark IN</button><button id="bo" class="alt" disabled>Mark OUT</button></div></div><h3>My history</h3><div class="card">${attTable(r,false)}</div>`},
+async stu(){return `<h2>Scholars</h2><div class="card"><form id="sf"><div class="row"><div><label>Full name</label><input name="name" required></div><div><label>Phone number</label><input name="phone" required pattern="[0-9+ ]{10,15}"></div></div>
+ <div class="row"><div><label>Department</label><input name="dept"></div><div><label>Category</label><select name="category"><option>PhD</option><option>JRF</option></select></div><div><label>Supervisor</label><input name="supervisor"></div></div><div id="sm"></div><button style="margin-top:10px">Register and send ID + password</button></form></div>
+ <div class="card scroll"><table><tr><th>Name</th><th>ID</th><th>Phone</th><th>Cat.</th><th></th></tr>${STU.map(s=>`<tr><td>${e(s.name)}<br><span class="mute">${e(s.dept)} ${e(s.supervisor)}</span></td><td>${e(s.uid)}</td><td>${e(s.phone)}</td><td>${e(s.category)}</td><td><button class="sm ghost" onclick="rs(${s.id})">Reset</button> <button class="sm" onclick="dl(${s.id})">Delete</button></td></tr>`).join('')}</table></div>`},
+async mtg(){const r=await api('/meetings');const adm=ME.role==='admin';return `<h2>DRC &amp; RAC</h2>${adm?`<div class="card"><form id="mf"><div class="row"><div><label>Scholar</label><select name="user_id">${opts()}</select></div><div><label>Type</label><select name="kind"><option>DRC</option><option>RAC</option></select></div></div><label>Title</label><input name="title" required><div class="row"><div><label>Date and time</label><input type="datetime-local" name="date" required></div><div><label>Committee members</label><input name="members"></div></div><div id="mm"></div><button style="margin-top:10px">Schedule meeting</button></form></div>`:''}
+ ${r.map(m=>`<div class="card"><span class="pill">${m.kind}</span> <span class="pill ${m.status==='approved'?'ok':m.status==='rejected'?'bad':''}">${m.status}</span><h3>${e(m.title)}</h3><div class="mute">${e(m.name)} - ${fd(m.date)}<br>Members: ${e(m.members)||'-'}</div>${m.minutes?`<p><b>Minutes:</b> ${e(m.minutes)}</p>`:''}
+ ${ME.role!=='student'?`<textarea id="mi${m.id}" placeholder="Minutes / remarks">${e(m.minutes)}</textarea><div class="row" style="margin-top:6px"><button class="sm" onclick="mu(${m.id},'approved')">Approve</button><button class="sm ghost" onclick="mu(${m.id},'rejected')">Reject</button><button class="sm alt" onclick="mu(${m.id},'completed')">Mark completed</button></div>`:''}</div>`).join('')||'<div class="card mute">No meetings yet.</div>'}`},
+async res(){const r=await api('/reports');const st=ME.role==='student';return `<h2>Research work</h2>${st?`<div class="card"><form id="rf"><label>Title</label><input name="title" required><div class="row"><div><label>Milestone / thesis chapter</label><input name="milestone"></div><div><label>Status</label><select name="status"><option>In progress</option><option>Completed</option><option>Blocked</option></select></div></div><label>Publications</label><input name="publications"><label>Progress notes</label><textarea name="notes" rows="3"></textarea><div id="rm"></div><button style="margin-top:10px">Submit report</button></form></div>`:''}
+ ${r.map(x=>`<div class="card"><span class="pill">${e(x.status)}</span><h3>${e(x.title)}</h3><div class="mute">${st?'':e(x.name)+' - '}${fd(x.created)}<br>Milestone: ${e(x.milestone)||'-'} | Publications: ${e(x.publications)||'-'}</div><p>${e(x.notes)}</p>
+ ${st?(x.feedback?`<p><b>Supervisor feedback:</b> ${e(x.feedback)}</p>`:''):`<textarea id="fb${x.id}" placeholder="Feedback">${e(x.feedback)}</textarea><button class="sm" style="margin-top:6px" onclick="sf(${x.id})">Save feedback</button>`}</div>`).join('')||'<div class="card mute">No reports yet.</div>'}`},
+async upd(){const r=await api('/updates');localStorage.seen=r[0]?.id||0;$('#bell').style.display='none';return `<h2>Class updates</h2>${ME.role==='admin'?`<div class="card"><form id="uf"><label>Title</label><input name="title" required><label>Message</label><textarea name="body" rows="3" required></textarea><label>Send to</label><select name="user_id"><option value="">All scholars</option>${opts()}</select><div id="um"></div><button style="margin-top:10px">Post and notify</button></form></div>`:''}
+ ${r.map(x=>`<div class="card"><h3>${e(x.title)}</h3><p>${e(x.body)}</p><span class="mute">${fd(x.created)}</span></div>`).join('')||'<div class="card mute">No updates yet.</div>'}`},
+async set(){const s=await api('/settings');return `<h2>Campus location</h2><div class="card"><p class="mute">Scholars can mark attendance only inside this circle.</p><form id="cf"><div class="row"><div><label>Latitude</label><input name="lat" value="${s.lat}" required></div><div><label>Longitude</label><input name="lng" value="${s.lng}" required></div><div><label>Radius (metres)</label><input name="radius" value="${s.radius}" required></div></div><div id="cm"></div><div class="row" style="margin-top:10px"><button type="button" class="ghost" id="loc">Use my current location</button><button>Save</button></div></form></div>`},
+async me(){return `<h2>${e(ME.name)}</h2><div class="card">ID: <b>${e(ME.uid)}</b><br>Phone: ${e(ME.phone)}<br>${e(ME.category)} - ${e(ME.dept)}<br>Supervisor: ${e(ME.supervisor)||'-'}</div><div class="card"><h3>Change password</h3><form id="pf"><label>Current password</label><input type="password" name="old" required><label>New password</label><input type="password" name="new" minlength="6" required><div id="pm"></div><button style="margin-top:10px">Change password</button></form></div>`}};
+const form=(id,fn)=>{const f=$(id);if(f)f.onsubmit=async ev=>{ev.preventDefault();try{await fn(Object.fromEntries(new FormData(f)))}catch(x){alert(x.message)}}};
+const B={
+att(){if(ME.role!=='student')return;const oc=$('#oc');
+ oc.onclick=async()=>{try{cam=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});$('#vid').srcObject=cam;$('#vid').classList.remove('hide');$('#bi').disabled=$('#bo').disabled=false;oc.disabled=true}catch(x){msg('#am','Camera blocked. Allow camera access and use HTTPS.')}};
+ const send=kind=>async()=>{msg('#am','Getting your location...',true);
+  try{const p=await new Promise((ok,no)=>navigator.geolocation.getCurrentPosition(ok,no,{enableHighAccuracy:true,timeout:15000}));
+   const v=$('#vid'),c=$('#cv');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
+   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.8));const f=new FormData();f.append('kind',kind);f.append('lat',p.coords.latitude);f.append('lng',p.coords.longitude);f.append('accuracy',p.coords.accuracy||0);f.append('photo',blob,'s.jpg');
+   const r=await fetch('/api/attendance',{method:'POST',headers:{Authorization:'Bearer '+T},body:f});const d=await r.json();if(!r.ok)throw Error(d.detail);
+   msg('#am',`${kind.toUpperCase()} marked. You are ${d.distance} m from the campus centre.`,true);setTimeout(()=>go('att'),1800)}catch(x){msg('#am',x.code?'Location blocked. Allow location access.':x.message)}};
+ $('#bi').onclick=send('in');$('#bo').onclick=send('out')},
+stu(){form('#sf',async d=>{const r=await api('/students',{method:'POST',json:d});STU=await api('/students');alert(`Registered.\nID: ${r.uid}\nPassword: ${r.password}\n(also sent by SMS)`);go('stu')})},
+mtg(){form('#mf',async d=>{d.user_id=+d.user_id;await api('/meetings',{method:'POST',json:d});go('mtg')})},
+res(){form('#rf',async d=>{await api('/reports',{method:'POST',json:d});go('res')})},
+upd(){form('#uf',async d=>{d.user_id=d.user_id?+d.user_id:null;await api('/updates',{method:'POST',json:d});go('upd')})},
+me(){form('#pf',async d=>{await api('/password',{method:'POST',json:d});msg('#pm','Password changed.',true)})},
+set(){form('#cf',async d=>{await api('/settings',{method:'PUT',json:{lat:+d.lat,lng:+d.lng,radius:+d.radius}});msg('#cm','Saved.',true)});
+ $('#loc').onclick=()=>navigator.geolocation.getCurrentPosition(p=>{const f=$('#cf');f.lat.value=p.coords.latitude;f.lng.value=p.coords.longitude},()=>alert('Location blocked'),{enableHighAccuracy:true})}};
+async function rs(i){if(!confirm('Generate a new password?'))return;const r=await api('/students/'+i+'/reset',{method:'POST'});alert(`New password for ${r.uid}: ${r.password}\n(also sent by SMS)`)}
+async function dl(i){if(!confirm('Delete this scholar?'))return;await api('/students/'+i,{method:'DELETE'});STU=await api('/students');go('stu')}
+async function mu(i,s){await api('/meetings/'+i,{method:'PUT',json:{status:s,minutes:$('#mi'+i).value}});go('mtg')}
+async function sf(i){await api(`/reports/${i}/feedback`,{method:'PUT',json:{feedback:$('#fb'+i).value}});go('res')}
+async function csv(){const r=await fetch('/api/attendance.csv?day='+(window.D||''),{headers:{Authorization:'Bearer '+T}});const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download='attendance.csv';a.click()}
+show();
+</script></body></html>
