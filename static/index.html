@@ -28,14 +28,37 @@ nav button.on{color:var(--red);box-shadow:inset 0 3px 0 var(--red)}
 table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
 .scroll{overflow-x:auto}video,canvas{width:100%;border-radius:10px;background:#000;max-height:50vh}
 .thumb{width:44px;height:44px;object-fit:cover;border-radius:6px}.mute{color:var(--mute)}.hide{display:none}
+body.admin{max-width:none;box-shadow:none}
+@media(min-width:900px){body.admin{padding-bottom:0}
+body.admin nav{left:0;top:68px;bottom:0;transform:none;width:210px;max-width:none;flex-direction:column;border-top:0;border-right:3px solid var(--gold);padding-top:8px}
+body.admin nav button{text-align:left;padding:15px 20px;font-size:.95rem;flex:none}
+body.admin nav button.on{box-shadow:inset 4px 0 0 var(--red);background:#f6eaeb}
+body.admin main{margin-left:210px;max-width:1200px;padding:26px}
+body.admin .stats{grid-template-columns:repeat(4,1fr)}
+body.admin .card form .row{flex-wrap:nowrap}}
 #login{max-width:380px;margin:8vh auto;text-align:center}#login img{width:150px}
+#login{max-width:430px;margin:0 auto;padding:26px 22px 0;text-align:left;min-height:100vh;display:flex;flex-direction:column}
+#login img{width:92px;margin-bottom:22px}
+#login .eyebrow{color:var(--red);font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase}
+#login h1{font:800 2.25rem/1.1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111827;margin:10px 0 12px}
+#login .sub{color:#6b7280;font-size:1.05rem;margin:0 0 26px}
+#login form{flex:1;display:flex;flex-direction:column}
+#login label{color:#111827;font-weight:600;font-size:.9rem;margin:14px 0 8px}
+#login .fld{background:#f1f3f6;border:0;border-radius:14px;padding:17px 16px;font-size:1rem}
+.pw{position:relative}.pw .fld{padding-right:52px}.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;color:#6b7280;padding:8px;min-height:0}
+#login .info{display:flex;gap:12px;align-items:center;background:#e4eaff;color:#1e3a8a;border-radius:14px;padding:14px;margin-top:22px;font-size:.9rem}
+#login .signin{margin-top:auto;position:sticky;bottom:16px;width:100%;background:#c8102e;border-radius:18px;padding:18px;font-size:1.05rem;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px rgba(200,16,46,.3)}
+#login form>.info{margin-bottom:26px}
 </style></head><body>
-<div id="login" class="hide card"><img src="/logo.png" alt="Santosh logo"><h2>Santosh Deemed to be University</h2>
-<p class="mute">PhD &amp; JRF Scholar Portal</p>
-<form id="lf" style="text-align:left"><label>User ID or phone number</label><input id="u" autocomplete="username" required>
-<label>Password</label><input id="p" type="password" autocomplete="current-password" required>
-<div id="le"></div><button style="width:100%;margin-top:10px">Log in</button></form>
-<p class="mute" style="font-size:.85rem">Your ID and password are sent to your phone when the university registers you.</p></div>
+<div id="login" class="hide"><img src="/logo.png" alt="Santosh logo">
+<div class="eyebrow">Santosh Deemed to be University</div><h1>PhD &amp; JRF<br>Scholar Portal</h1>
+<p class="sub">Sign in with the phone number and password issued by the University admin.</p>
+<form id="lf"><label>Phone number or Student ID</label><input id="u" class="fld" placeholder="10-digit mobile number" autocomplete="username" required>
+<label>Password</label><div class="pw"><input id="p" class="fld" type="password" placeholder="Enter password" autocomplete="current-password" required><button type="button" id="eye" aria-label="Show password">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+<div id="le"></div>
+<div class="info"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg><span>Don't have credentials? Contact the university admin office to get your ID and password.</span></div>
+<button class="signin"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg> Sign In</button></form></div>
 <div id="app" class="hide"><header><img src="/logo.png" alt=""><b>Santosh Deemed to be University<small id="who"></small></b><button class="sm ghost" id="bell" style="display:none"></button><button class="sm ghost" onclick="logout()">Log out</button></header>
 <main id="v"></main><nav id="nav"></nav></div>
 <script>
@@ -46,14 +69,15 @@ async function api(p,o={}){const h={};if(T)h.Authorization='Bearer '+T;if(o.json
  if(r.status===401&&p!=='/login'){logout();throw Error('Session ended')}if(!r.ok)throw Error(d.detail||'Something went wrong');return d}
 const msg=(id,t,ok)=>{$(id).innerHTML=t?`<div class="msg ${ok?'g':'e'}">${e(t)}</div>`:''};
 const fd=t=>t?new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'';
-function logout(){localStorage.removeItem('t');T=null;ME=null;stopCam();show()}
+function logout(){document.body.classList.remove('admin');localStorage.removeItem('t');T=null;ME=null;stopCam();show()}
+$('#eye').onclick=()=>{const i=$('#p');i.type=i.type==='password'?'text':'password'};
 $('#lf').onsubmit=async ev=>{ev.preventDefault();try{const d=await api('/login',{method:'POST',json:{uid:$('#u').value,password:$('#p').value}});T=d.token;localStorage.t=T;ME=d.user;show()}catch(x){msg('#le',x.message)}};
 const ADMIN=[['dash','Home'],['stu','Students'],['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['set','Campus']];
 const STUDENT=[['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['me','Profile']];
 async function show(){
  if(!T){$('#login').classList.remove('hide');$('#app').classList.add('hide');return}
  try{ME=await api('/me')}catch{return}
- $('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=`${ME.name} (${ME.uid})`;
+ document.body.classList.toggle('admin',ME.role!=='student');$('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=`${ME.name} (${ME.uid})`;
  const items=ME.role==='student'?STUDENT:ADMIN;$('#nav').innerHTML=items.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('');
  if(ME.role!=='student')STU=await api('/students');go(items[0][0]);bellCheck()}
 async function bellCheck(){const u=await api('/updates');const seen=+localStorage.seen||0;const n=u.filter(x=>x.id>seen).length;const b=$('#bell');
