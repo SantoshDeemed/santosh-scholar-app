@@ -90,6 +90,7 @@ body.stu nav button.fab{flex:none;width:64px;height:64px;border-radius:50%;backg
 .lg{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:.8rem;color:var(--mute)}.lg i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
 .lg .p{background:#16a34a}.lg .a{background:#dc2626}.lg .f{background:#cfd7e4}
 .s3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.s3 .card{margin:0;text-align:center;padding:12px 6px}.s3 b{display:block;font:800 1.6rem Georgia,serif}
+.sk{height:170px;margin:14px;border-radius:18px;background:linear-gradient(90deg,#e6ebf3 25%,#f3f6fb 50%,#e6ebf3 75%);background-size:200% 100%;animation:sh 1s linear infinite}@keyframes sh{to{background-position:-200% 0}}@media(prefers-reduced-motion:reduce){.sk{animation:none}}
 </style></head><body>
 <div id="login" class="hide"><img src="/logo.png" alt="Santosh logo">
 <div class="eyebrow">Santosh Deemed to be University</div><h1>PhD &amp; JRF<br>Scholar Portal</h1>
@@ -112,20 +113,20 @@ const msg=(id,t,ok)=>{$(id).innerHTML=t?`<div class="msg ${ok?'g':'e'}">${e(t)}<
 const fd=t=>t?new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'';
 function logout(){document.body.classList.remove('admin','stu');localStorage.removeItem('t');T=null;ME=null;stopCam();show()}
 $('#eye').onclick=()=>{const i=$('#p');i.type=i.type==='password'?'text':'password'};
-$('#lf').onsubmit=async ev=>{ev.preventDefault();try{const d=await api('/login',{method:'POST',json:{uid:$('#u').value,password:$('#p').value}});T=d.token;localStorage.t=T;ME=d.user;show()}catch(x){msg('#le',x.message)}};
+$('#lf').onsubmit=async ev=>{ev.preventDefault();const sb=$('.signin');sb.disabled=true;sb.lastChild.textContent=' Signing in...';try{const d=await api('/login',{method:'POST',json:{uid:$('#u').value,password:$('#p').value}});T=d.token;localStorage.t=T;ME=d.user;show()}catch(x){msg('#le',x.message)}sb.disabled=false;sb.lastChild.textContent=' Sign In'};
 const ADMIN=[['dash','Home'],['stu','Students'],['att','Attendance'],['mtg','DRC/RAC'],['res','Research'],['upd','Updates'],['set','Campus']];
 const STUDENT=[['home','Home']];
 async function show(){
  if(!T){$('#login').classList.remove('hide');$('#app').classList.add('hide');return}
- try{ME=await api('/me')}catch{return}
+ try{ME=ME||await api('/me')}catch{return}
  document.body.classList.toggle('admin',ME.role!=='student');document.body.classList.toggle('stu',ME.role==='student');$('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=`${ME.name} (${ME.uid})`;
  const items=ME.role==='student'?STUDENT:ADMIN;$('#nav').innerHTML=ME.role==='student'?SNAV:items.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('');
- if(ME.role!=='student')STU=await api('/students');go(items[0][0]);bellCheck()}
+ if(ME.role!=='student')STU=await api('/students');go(items[0][0]);if(ME.role!=='student')bellCheck()}
 async function bellCheck(){const u=await api('/updates');const seen=+localStorage.seen||0;const n=u.filter(x=>x.id>seen).length;const b=$('#bell');
  b.style.display=n?'':'none';b.textContent=`${n} new`;b.onclick=()=>go('upd')}
 let cam=null;function stopCam(){cam&&cam.getTracks().forEach(t=>t.stop());cam=null}
 async function go(k){stopCam();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
- try{$('#v').innerHTML=wrap(k,await V[k]())}catch(x){$('#v').innerHTML=`<div class="msg e">${e(x.message)}</div>`}if(B[k])B[k]()}
+ $('#v').innerHTML='<div class="sk"></div>';try{$('#v').innerHTML=wrap(k,await V[k]())}catch(x){$('#v').innerHTML=`<div class="msg e">${e(x.message)}</div>`}if(B[k])B[k]()}
 const opts=()=>STU.filter(s=>s.role==='student').map(s=>`<option value="${s.id}">${e(s.name)} (${e(s.uid)})</option>`).join('');
 const attTable=(r,adm)=>`<div class="scroll"><table><tr><th>Photo</th>${adm?'<th>Student</th>':''}<th>Time</th><th>Type</th><th>Status</th><th>Dist</th></tr>${r.map(a=>`<tr><td><a href="/uploads/${a.photo}" target="_blank"><img class="thumb" src="/uploads/${a.photo}" alt="selfie"></a></td>${adm?`<td>${e(a.name)}<br><span class="mute">${e(a.uid)}</span></td>`:''}<td>${fd(a.ts)}</td><td>${a.kind.toUpperCase()}</td><td><span class="pill ${a.status==='present'?'ok':'bad'}">${a.status}</span></td><td>${Math.round(a.dist)} m<br><a href="https://maps.google.com/?q=${a.lat},${a.lng}" target="_blank">map</a></td></tr>`).join('')||'<tr><td colspan=6 class="mute">No records yet.</td></tr>'}</table></div>`;
 const V={
@@ -171,7 +172,7 @@ const tm=x=>x?new Date(x.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-di
 function amap(r){const m={};r.filter(x=>x.status==='present').forEach(x=>{(m[x.day]=m[x.day]||{})[x.kind]=x});return m}
 function dstat(m,k,d){const td=ymd(new Date()),cr=(ME.created||'').slice(0,10);if(m[k])return'p';if(k>=td||k<cr||d.getDay()===0)return d.getDay()===0?'s':'f';return'a'}
 function mstats(m,y,mo){let p=0,a=0;const n=new Date(y,mo+1,0).getDate();for(let i=1;i<=n;i++){const d=new Date(y,mo,i),t=dstat(m,ymd(d),d);if(t==='p')p++;if(t==='a')a++}return{p,a,pct:p+a?Math.round(p*100/(p+a)):0}}
-V.home=async()=>{const r=await api('/attendance'),u=await api('/updates'),m=amap(r),n=new Date(),s=mstats(m,n.getFullYear(),n.getMonth()),t=m[ymd(n)]||{},nw=u.filter(x=>x.id>(+localStorage.seen||0)).length;
+V.home=async()=>{const [r,u]=await Promise.all([api('/attendance'),api('/updates')]),m=amap(r),n=new Date(),s=mstats(m,n.getFullYear(),n.getMonth()),t=m[ymd(n)]||{},nw=u.filter(x=>x.id>(+localStorage.seen||0)).length;
  const G=[['cam','Attendance','att','#c8102e'],['cal','Calendar','cal','#1b5aa8'],['book','DRC','mtg','#7c3aed'],['users','RAC','mtg','#0e9f6e'],['flask','Research','res','#d97706'],['bell','Updates','upd','#0891b2'],['user','Account','me','#475569'],['out','Log out','logout','#64748b']];
  return `<section class="hero"><div class="top"><img src="/logo.png" alt=""><div><small>Welcome back</small><b>${e(ME.name)}</b></div><button class="bellb" onclick="go('upd')" aria-label="Updates">${ic('bell')}${nw?'<i></i>':''}</button></div>
  <div class="sum"><div class="ringp" style="--p:${s.pct}"><b>${s.pct}%</b></div><div><span>This month</span><strong>${e(ME.category)} scholar</strong><div class="pa"><em class="g">${s.p} present</em><em class="r">${s.a} absent</em></div></div></div>

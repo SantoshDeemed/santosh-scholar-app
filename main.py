@@ -18,6 +18,8 @@ else:
     BIN = lambda b: b
     os.makedirs(os.path.dirname(DB) or ".", exist_ok=True)
 app = FastAPI(title="Santosh Scholar App")
+from starlette.middleware.gzip import GZipMiddleware
+app.add_middleware(GZipMiddleware, minimum_size=800)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users(id {ID}, uid TEXT UNIQUE, phone TEXT UNIQUE, name TEXT,
@@ -34,9 +36,25 @@ CREATE TABLE IF NOT EXISTS reports(id {ID}, user_id INTEGER, title TEXT, milesto
 CREATE TABLE IF NOT EXISTS updates(id {ID}, title TEXT, body TEXT, user_id INTEGER, created TEXT)
 """
 
+_pool = None
+NETERR = (psycopg2.OperationalError, psycopg2.InterfaceError) if PG else ()
+
 def conn():
-    if PG: return psycopg2.connect(DBURL, cursor_factory=psycopg2.extras.RealDictCursor)
-    c = sqlite3.connect(DB); c.row_factory = sqlite3.Row; return c
+    global _pool
+    if not PG:
+        c = sqlite3.connect(DB); c.row_factory = sqlite3.Row; return c
+    if _pool is None:   # reuse connections: no new SSL handshake on every query = fast
+        from psycopg2.pool import ThreadedConnectionPool
+        _pool = ThreadedConnectionPool(1, 20, DBURL, cursor_factory=psycopg2.extras.RealDictCursor,
+                                       keepalives=1, keepalives_idle=30, keepalives_interval=10, keepalives_count=3)
+    return _pool.getconn()
+
+def release(c, bad=False):
+    if not PG: c.close(); return
+    try:
+        if not bad: c.rollback()
+    except Exception: bad = True
+    _pool.putconn(c, close=bad or bool(c.closed))
 
 def fix(sql):
     if not PG: return sql
@@ -47,22 +65,27 @@ def fix(sql):
     return sql
 
 def q(sql, a=(), one=False, write=False):
-    c = conn(); sql = fix(sql)
-    try:
-        cur = c.cursor(); cur.execute(sql, a)
-        if write:
-            rid = cur.fetchone()["id"] if PG and sql.endswith("RETURNING id") else (None if PG else cur.lastrowid)
-            c.commit(); return rid
-        r = [dict(x) for x in cur.fetchall()]
-        return (r[0] if r else None) if one else r
-    finally: c.close()
+    sql = fix(sql)
+    for attempt in (0, 1):
+        c = conn(); bad = False
+        try:
+            cur = c.cursor(); cur.execute(sql, a)
+            if write:
+                rid = cur.fetchone()["id"] if PG and sql.endswith("RETURNING id") else (None if PG else cur.lastrowid)
+                c.commit(); return rid
+            r = [dict(x) for x in cur.fetchall()]
+            return (r[0] if r else None) if one else r
+        except NETERR:      # stale connection (database slept): drop it and retry once
+            bad = True
+            if attempt: raise
+        finally: release(c, bad)
 
 def setup():
     sc = SCHEMA.replace("{ID}", "SERIAL PRIMARY KEY" if PG else "INTEGER PRIMARY KEY").replace("{REAL}", "DOUBLE PRECISION" if PG else "REAL").replace("{BLOB}", "BYTEA" if PG else "BLOB")
     c = conn(); cur = c.cursor()
     for st in sc.split(";"):
         if st.strip(): cur.execute(st)
-    c.commit(); c.close()
+    c.commit(); release(c)
 
 def hp(pw, salt): return hashlib.pbkdf2_hmac("sha256", pw.encode(), salt.encode(), 120_000).hex()
 def now(): return dt.datetime.now().isoformat(timespec="seconds")
@@ -114,6 +137,9 @@ class MeetingUp(BaseModel): status: str; minutes: str = ""
 class ReportIn(BaseModel): title: str; milestone: str = ""; status: str = "In progress"; publications: str = ""; notes: str = ""
 class FeedbackIn(BaseModel): feedback: str
 class UpdateIn(BaseModel): title: str; body: str; user_id: Optional[int] = None
+
+@app.get("/api/health")
+def health(): q("SELECT 1 AS ok"); return {"ok": True}   # ping this every 5 min (UptimeRobot) to keep app + database awake
 
 @app.post("/api/login")
 def login(d: LoginIn):
